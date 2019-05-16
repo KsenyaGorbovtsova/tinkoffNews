@@ -54,6 +54,8 @@ class TableViewController: UITableViewController {
         }
     }
     private func requestNext20 () {
+        if isInternetAvailable()
+        {
         let url = URL(string: "https://cfg.tinkoff.ru/news/public/api/platform/v1/getArticles?pageSize=\(pageSize)&pageOffset=\(pageOffset)")
         if let endPoint = url {
             var request = URLRequest(url: endPoint)
@@ -75,6 +77,9 @@ class TableViewController: UITableViewController {
             dataTask.resume()
         } else {
             //не верный урл
+            }
+        } else {
+            DisplayWarnining(warning: "проверьте подключение к интернету", title: "Упс!", dismissing: false, sender: self)
         }
     }
     

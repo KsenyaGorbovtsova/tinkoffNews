@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "tinkoffNews/ViewController.swift"
-            timestampString = "579699271.919034"
+            timestampString = "579702911.661862"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "36"
-            endingLineNumber = "36"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
             landmarkName = "requestDetails()"
             landmarkType = "7">
          </BreakpointContent>

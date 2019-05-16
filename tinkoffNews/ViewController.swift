@@ -16,10 +16,12 @@ class ViewController: UIViewController {
     @IBOutlet weak var mainTiltle: UILabel!
     @IBOutlet weak var textShort: UILabel!
     @IBOutlet weak var longText: UITextView!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         requestDetails()
+        
+        
         self.navigationController?.navigationBar.prefersLargeTitles = false
         self.mainTiltle.numberOfLines = 0
         self.textShort.numberOfLines = 0
@@ -33,6 +35,8 @@ class ViewController: UIViewController {
     }
     
     private func requestDetails () {
+        if isInternetAvailable()
+        {
         let url = URL(string: "https://cfg.tinkoff.ru/news/public/api/platform/v1/getArticle?urlSlug=\(self.slug)")
         if let endPoint = url {
             var request = URLRequest(url: endPoint)
@@ -51,6 +55,10 @@ class ViewController: UIViewController {
             dataTask.resume()
         } else {
             //не верный урл
+        }
+        }
+        else {
+             DisplayWarnining(warning: "проверьте подключение к интернету", title: "Упс!", dismissing: false, sender: self)
         }
     }
     private func parseResponse(data: Data) {
@@ -78,7 +86,11 @@ class ViewController: UIViewController {
             spinner.removeFromSuperview()
         }
     }
+
+   
 }
+
 extension Notification.Name {
     static let reloadView = Notification.Name("reloadView")
+    
 }

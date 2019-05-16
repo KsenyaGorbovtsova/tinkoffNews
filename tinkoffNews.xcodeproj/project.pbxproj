@@ -14,7 +14,7 @@
 		9E57E8A3228D3439008B1558 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9E57E8A2228D3439008B1558 /* Assets.xcassets */; };
 		9E57E8A6228D3439008B1558 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9E57E8A4228D3439008B1558 /* LaunchScreen.storyboard */; };
 		9E57E8AE228D3686008B1558 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57E8AD228D3686008B1558 /* TableViewController.swift */; };
-		9E57E8B0228D486D008B1558 /* Structs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57E8AF228D486D008B1558 /* Structs.swift */; };
+		9E57E8B0228D486D008B1558 /* Structs and func.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E57E8AF228D486D008B1558 /* Structs and func.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 		9E57E8A5228D3439008B1558 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9E57E8A7228D3439008B1558 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9E57E8AD228D3686008B1558 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
-		9E57E8AF228D486D008B1558 /* Structs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Structs.swift; sourceTree = "<group>"; };
+		9E57E8AF228D486D008B1558 /* Structs and func.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Structs and func.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,7 +63,7 @@
 				9E57E898228D3438008B1558 /* AppDelegate.swift */,
 				9E57E8AD228D3686008B1558 /* TableViewController.swift */,
 				9E57E89A228D3438008B1558 /* ViewController.swift */,
-				9E57E8AF228D486D008B1558 /* Structs.swift */,
+				9E57E8AF228D486D008B1558 /* Structs and func.swift */,
 				9E57E89C228D3438008B1558 /* Main.storyboard */,
 				9E57E8A2228D3439008B1558 /* Assets.xcassets */,
 				9E57E8A4228D3439008B1558 /* LaunchScreen.storyboard */,
@@ -147,7 +147,7 @@
 				9E57E89B228D3438008B1558 /* ViewController.swift in Sources */,
 				9E57E8AE228D3686008B1558 /* TableViewController.swift in Sources */,
 				9E57E899228D3438008B1558 /* AppDelegate.swift in Sources */,
-				9E57E8B0228D486D008B1558 /* Structs.swift in Sources */,
+				9E57E8B0228D486D008B1558 /* Structs and func.swift in Sources */,
 				9E57E8A1228D3438008B1558 /* tinkoffNews.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
