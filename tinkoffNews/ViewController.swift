@@ -59,11 +59,13 @@ class ViewController: UIViewController {
             news[0].setValue(counter, forKey: "clickCount")
             do {
                 try managedContext.save()
+                
             } catch {
                 print("Failed saving")
             }
+            NotificationCenter.default.post(name: .reloadCounter, object: nil, userInfo: ["counter": counter])
         }
-     
+        
         }
     
     private func cashDetails(info: detailInfo) {
@@ -122,7 +124,6 @@ class ViewController: UIViewController {
     }
      func reloadView1(){
         DispatchQueue.main.async {
-            print(self.pieceOfNews?.text)
             let data = Data((self.pieceOfNews?.text.utf8)!)
             if let attributedString = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], documentAttributes: nil) {
                 self.longText.attributedText = attributedString
@@ -135,7 +136,6 @@ class ViewController: UIViewController {
     }
     @objc func reloadView(notification: Notification){
         DispatchQueue.main.async {
-            print(self.pieceOfNews?.text)
             let data = Data((self.pieceOfNews?.text.utf8)!)
             if let attributedString = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], documentAttributes: nil) {
                 self.longText.attributedText = attributedString

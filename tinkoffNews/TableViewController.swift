@@ -13,15 +13,18 @@ import Foundation
 class TableViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        
+        tableView.reloadData()
     }
+    var indexPathChoosenCell = IndexPath()
     var listNews = [piece]()
+    var updateCounter = 0
     var loadedNews = [NSManagedObject]()
     var pageOffsetManage = [NSManagedObject]()
     var pageOffset = 0
     var pageSize = 20
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadCounter(notification:)), name: .reloadCounter, object: nil)
         self.navigationController?.navigationBar.prefersLargeTitles = true
             guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
             let managedContext = appDelegate.persistentContainer.viewContext
@@ -70,17 +73,23 @@ class TableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
+       
         let cell = tableView.dequeueReusableCell(withIdentifier: "pieceOfNews", for: indexPath)
+        if indexPath == self.indexPathChoosenCell {
+            cell.detailTextLabel?.text = "Просмотры: " + String(self.updateCounter)
+        } else {
         let newsInf = self.listNews[indexPath.row]
         cell.textLabel?.text = newsInf.title
         cell.textLabel?.numberOfLines = 0
         cell.detailTextLabel?.text = "Просмотры: " + String(newsInf.clicks)
+        }
         return cell
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "detail" {
+            
              let indexPath = self.tableView.indexPath(for: (sender as! UITableViewCell))
+            self.indexPathChoosenCell = indexPath!
             let newsSlug = self.listNews[indexPath!.row].slug
            
             let detailView = segue.destination as! ViewController
@@ -166,9 +175,17 @@ class TableViewController: UITableViewController {
         tableView.reloadData()
         refreshControl?.endRefreshing()
     }
+    @objc func reloadCounter(notification: Notification) {
+        if let data = notification.userInfo as? [String:Int] {
+            for x in data {
+                self.updateCounter = x.value
+            }
+        }
+    }
 }
 extension Notification.Name {
     static let reloadNews = Notification.Name("reloadNews")
+    static let reloadCounter = Notification.Name("reloadCounter")
 }
 
 extension Date {
