@@ -20,6 +20,7 @@ struct piece: Codable {
     let title: String
     let date: String
     let slug: String
+    let clicks: Int
 }
 
 struct detailResponse: Codable {

@@ -11,7 +11,10 @@ import CoreData
 import Foundation
 
 class TableViewController: UITableViewController {
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        
+    }
     var listNews = [piece]()
     var loadedNews = [NSManagedObject]()
     var pageOffsetManage = [NSManagedObject]()
@@ -19,7 +22,7 @@ class TableViewController: UITableViewController {
     var pageSize = 20
     override func viewDidLoad() {
         super.viewDidLoad()
-       // if listNews.isEmpty == true {
+        self.navigationController?.navigationBar.prefersLargeTitles = true
             guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
             let managedContext = appDelegate.persistentContainer.viewContext
             let fetchRequestCounter = NSFetchRequest<NSFetchRequestResult>(entityName: "Load")
@@ -39,7 +42,7 @@ class TableViewController: UITableViewController {
                 loadedNews = try! managedContext.fetch(fetchRequestNews) as! [NSManagedObject]
                 if loadedNews.isEmpty == false {
                     for x in loadedNews {
-                        let appendPiece = piece(id: x.value(forKey: "id") as! String, title: x.value(forKey: "title") as! String, date: x.value(forKey: "date") as! String, slug: x.value(forKey: "slug") as! String)
+                        let appendPiece = piece(id: x.value(forKey: "id") as! String, title: x.value(forKey: "title") as! String, date: x.value(forKey: "date") as! String, slug: x.value(forKey: "slug") as! String, clicks: x.value(forKey: "clickCount") as! Int)
                         listNews.append(appendPiece)
                     }
                 }else {
@@ -51,7 +54,7 @@ class TableViewController: UITableViewController {
             }
      //   }
         
-        self.navigationController?.navigationBar.prefersLargeTitles = true
+       
         self.title = "TinkoffNews"
         let refreshControl = UIRefreshControl()
         refreshControl.tintColor = UIColor.init(displayP3Red: 1.00, green:0.92, blue:0.23, alpha:1.0)
@@ -72,9 +75,7 @@ class TableViewController: UITableViewController {
         let newsInf = self.listNews[indexPath.row]
         cell.textLabel?.text = newsInf.title
         cell.textLabel?.numberOfLines = 0
-        
-      //  cell.detailTextLabel?.text = Date.getFormattedDate(string: newsInf.date, formatter: "yyyy-mm-ddThh:mm:ssZ", newFormat: "MM-dd-yyyy")
-        cell.detailTextLabel?.text = newsInf.date
+        cell.detailTextLabel?.text = "Просмотры: " + String(newsInf.clicks)
         return cell
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -142,8 +143,6 @@ class TableViewController: UITableViewController {
                 print("Failed saving")
             }
         }
-       // let entityCounter = NSEntityDescription.entity(forEntityName: "Load", in: context)
-        //let counter = NSManagedObject(entity: entityCounter!, insertInto: context)
         if pageOffsetManage.isEmpty == true {
             let entityCounter = NSEntityDescription.entity(forEntityName: "Load", in: context)
             let counter = NSManagedObject(entity: entityCounter!, insertInto: context)

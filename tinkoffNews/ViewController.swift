@@ -11,12 +11,7 @@ import CoreData
 
 class ViewController: UIViewController {
     var slug = ""
-    var pieceOfNews: detailInfo?{
-        didSet {
-             NotificationCenter.default.post(name: .reloadView, object: nil)
-            stopSpinner(spinner: spinner)
-        }
-    }
+    var pieceOfNews: detailInfo?
     let spinner = UIActivityIndicatorView(style: .gray)
     @IBOutlet weak var mainTiltle: UILabel!
     @IBOutlet weak var textShort: UILabel!
@@ -25,7 +20,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(reloadView(notification:)), name: .reloadView, object: nil)
-        
+        self.navigationController?.navigationBar.prefersLargeTitles = false
+        self.mainTiltle.numberOfLines = 0
+        self.textShort.numberOfLines = 0
+        self.spinner.color = UIColor.init(displayP3Red: 1.00, green:0.92, blue:0.23, alpha:1.0)
+        self.spinner.center = view.center
+        self.spinner.hidesWhenStopped = false
+        self.spinner.startAnimating()
+        view.addSubview(self.spinner)
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let managedContext = appDelegate.persistentContainer.viewContext
         let detailFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Detail")
@@ -35,21 +37,37 @@ class ViewController: UIViewController {
         if details.isEmpty == true {
             requestDetails()
         } else {
-            pieceOfNews = detailInfo(slug: details[0].value(forKey: "slug") as! String, title: details[0].value(forKey: "title") as! String, text: details[0].value(forKey: "text") as! String, textShort: details[0].value(forKey: "textShort") as! String)
-           
+            self.pieceOfNews = detailInfo(slug: details[0].value(forKey: "slug") as! String, title: details[0].value(forKey: "title") as! String, text: details[0].value(forKey: "text") as! String, textShort: details[0].value(forKey: "textShort") as! String)
+                reloadView1()
+                stopSpinner(spinner: spinner)
+            increaseViews(slug: details[0].value(forKey: "slug") as! String)
         }
         
-        self.navigationController?.navigationBar.prefersLargeTitles = false
-        self.mainTiltle.numberOfLines = 0
-        self.textShort.numberOfLines = 0
-        self.spinner.color = UIColor.init(displayP3Red: 1.00, green:0.92, blue:0.23, alpha:1.0)
-        self.spinner.center = view.center
-        self.spinner.hidesWhenStopped = false
-        self.spinner.startAnimating()
-        view.addSubview(self.spinner)
+        
        
     }
+    private func increaseViews(slug: String) {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let newsFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
+        newsFetch.fetchLimit = 1
+        newsFetch.predicate = NSPredicate(format: "slug = %@", slug)
+        let news = try! managedContext.fetch(newsFetch) as! [NSManagedObject]
+        if news.isEmpty == false {
+            var counter = news[0].value(forKey: "clickCount") as! Int
+            counter += 1
+            news[0].setValue(counter, forKey: "clickCount")
+            do {
+                try managedContext.save()
+            } catch {
+                print("Failed saving")
+            }
+        }
+     
+        }
+    
     private func cashDetails(info: detailInfo) {
+        DispatchQueue.main.async {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
         let entityDetail = NSEntityDescription.entity(forEntityName: "Detail", in: context)
@@ -62,6 +80,7 @@ class ViewController: UIViewController {
             try context.save()
         } catch {
             print("Failed saving")
+        }
         }
     }
     
@@ -97,15 +116,33 @@ class ViewController: UIViewController {
         let resp = try! decoder.decode(detailResponse.self, from: data)
         self.pieceOfNews = resp.response
         cashDetails(info: resp.response)
+        NotificationCenter.default.post(name: .reloadView, object: nil)
+        increaseViews(slug: resp.response.slug)
+        //stopSpinner(spinner: spinner)
     }
-    @objc func reloadView(notification: Notification){
+     func reloadView1(){
         DispatchQueue.main.async {
+            print(self.pieceOfNews?.text)
             let data = Data((self.pieceOfNews?.text.utf8)!)
             if let attributedString = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], documentAttributes: nil) {
                 self.longText.attributedText = attributedString
             }
             self.mainTiltle.text = self.pieceOfNews?.title
             self.textShort.text = self.pieceOfNews?.textShort
+            self.stopSpinner(spinner: self.spinner)
+        }
+        
+    }
+    @objc func reloadView(notification: Notification){
+        DispatchQueue.main.async {
+            print(self.pieceOfNews?.text)
+            let data = Data((self.pieceOfNews?.text.utf8)!)
+            if let attributedString = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], documentAttributes: nil) {
+                self.longText.attributedText = attributedString
+            }
+            self.mainTiltle.text = self.pieceOfNews?.title
+            self.textShort.text = self.pieceOfNews?.textShort
+            self.stopSpinner(spinner: self.spinner)
         }
         
     }
