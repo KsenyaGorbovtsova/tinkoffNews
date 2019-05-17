@@ -13,11 +13,44 @@ import Foundation
 class TableViewController: UITableViewController {
     
     var listNews = [piece]()
+    var loadedNews = [NSManagedObject]()
+    var pageOffsetManage = [NSManagedObject]()
     var pageOffset = 0
     var pageSize = 20
     override func viewDidLoad() {
         super.viewDidLoad()
-        requestNext20()
+       // if listNews.isEmpty == true {
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+            let managedContext = appDelegate.persistentContainer.viewContext
+            let fetchRequestCounter = NSFetchRequest<NSFetchRequestResult>(entityName: "Load")
+            do {
+                pageOffsetManage = try! managedContext.fetch(fetchRequestCounter) as! [NSManagedObject]
+                if pageOffsetManage.isEmpty == false {
+                pageOffset = pageOffsetManage[0].value(forKey: "counter") as! Int
+                }else {
+                    pageOffset = 0
+                }
+            } catch {
+                print(error)
+            }
+            
+            let fetchRequestNews = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
+            do {
+                loadedNews = try! managedContext.fetch(fetchRequestNews) as! [NSManagedObject]
+                if loadedNews.isEmpty == false {
+                    for x in loadedNews {
+                        let appendPiece = piece(id: x.value(forKey: "id") as! String, title: x.value(forKey: "title") as! String, date: x.value(forKey: "date") as! String, slug: x.value(forKey: "slug") as! String)
+                        listNews.append(appendPiece)
+                    }
+                }else {
+                    requestNext20()
+                }
+                
+            } catch {
+                print(error)
+            }
+     //   }
+        
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.title = "TinkoffNews"
         let refreshControl = UIRefreshControl()
@@ -68,7 +101,7 @@ class TableViewController: UITableViewController {
                     return
                 }
                 self.parseResponse(data: data)
-                self.pageOffset += 20
+               // self.pageOffset += 20
                
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
@@ -88,9 +121,44 @@ class TableViewController: UITableViewController {
         let resp = try! decoder.decode(response.self, from: data)
         self.listNews = self.listNews + resp.response.news
         self.listNews.sort{($0.date)>($1.date)}
+        cashNews(news: resp.response.news)
       
     }
-   
+    private func cashNews(news: [piece]) {
+        pageOffset = pageOffset + news.count
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        let entityNews = NSEntityDescription.entity(forEntityName: "News", in: context)
+        
+        for x in news {
+            let newNews = NSManagedObject(entity: entityNews!, insertInto: context)
+            newNews.setValue(x.title, forKey: "title")
+            newNews.setValue(x.slug, forKey: "slug")
+            newNews.setValue(x.date, forKey: "date")
+            newNews.setValue(x.id, forKey: "id")
+            do {
+                try context.save()
+            } catch {
+                print("Failed saving")
+            }
+        }
+       // let entityCounter = NSEntityDescription.entity(forEntityName: "Load", in: context)
+        //let counter = NSManagedObject(entity: entityCounter!, insertInto: context)
+        if pageOffsetManage.isEmpty == true {
+            let entityCounter = NSEntityDescription.entity(forEntityName: "Load", in: context)
+            let counter = NSManagedObject(entity: entityCounter!, insertInto: context)
+            counter.setValue(pageOffset, forKey: "counter")
+        }else {
+        if pageOffsetManage[0].value(forKey: "counter") as! Int != pageOffset{
+            pageOffsetManage[0].setValue(pageOffset, forKey: "counter")
+        }
+        do {
+            try context.save()
+        } catch {
+            print("Failed saving")
+        }
+        }
+    }
     @objc func reloadNews (notification: Notification) {
         self.requestNext20()
     }
