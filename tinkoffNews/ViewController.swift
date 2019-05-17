@@ -11,7 +11,12 @@ import CoreData
 
 class ViewController: UIViewController {
     var slug = ""
-    var pieceOfNews: detailInfo?
+    var pieceOfNews: detailInfo?{
+        didSet {
+             NotificationCenter.default.post(name: .reloadView, object: nil)
+            stopSpinner(spinner: spinner)
+        }
+    }
     let spinner = UIActivityIndicatorView(style: .gray)
     @IBOutlet weak var mainTiltle: UILabel!
     @IBOutlet weak var textShort: UILabel!
@@ -19,8 +24,20 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        requestDetails()
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadView(notification:)), name: .reloadView, object: nil)
         
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let detailFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Detail")
+        detailFetch.fetchLimit = 1
+        detailFetch.predicate = NSPredicate(format: "slug = %@", slug)
+        let details = try! managedContext.fetch(detailFetch) as! [NSManagedObject]
+        if details.isEmpty == true {
+            requestDetails()
+        } else {
+            pieceOfNews = detailInfo(slug: details[0].value(forKey: "slug") as! String, title: details[0].value(forKey: "title") as! String, text: details[0].value(forKey: "text") as! String, textShort: details[0].value(forKey: "textShort") as! String)
+           
+        }
         
         self.navigationController?.navigationBar.prefersLargeTitles = false
         self.mainTiltle.numberOfLines = 0
@@ -30,8 +47,22 @@ class ViewController: UIViewController {
         self.spinner.hidesWhenStopped = false
         self.spinner.startAnimating()
         view.addSubview(self.spinner)
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadView(notification:)), name: .reloadView, object: nil)
        
+    }
+    private func cashDetails(info: detailInfo) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        let entityDetail = NSEntityDescription.entity(forEntityName: "Detail", in: context)
+        let newInfo = NSManagedObject(entity: entityDetail!, insertInto: context)
+        newInfo.setValue(info.slug, forKey: "slug")
+        newInfo.setValue(info.text, forKey: "text")
+        newInfo.setValue(info.textShort, forKey: "textShort")
+        newInfo.setValue(info.title, forKey: "title")
+        do {
+            try context.save()
+        } catch {
+            print("Failed saving")
+        }
     }
     
     private func requestDetails () {
@@ -58,16 +89,14 @@ class ViewController: UIViewController {
         }
         }
         else {
-             DisplayWarnining(warning: "проверьте подключение к интернету", title: "Упс!", dismissing: false, sender: self)
+             DisplayWarnining(warning: "проверьте подключение к интернету", title: "Упс!", dismissing: true, sender: self)
         }
     }
     private func parseResponse(data: Data) {
         let decoder = JSONDecoder()
         let resp = try! decoder.decode(detailResponse.self, from: data)
         self.pieceOfNews = resp.response
-        NotificationCenter.default.post(name: .reloadView, object: nil)
-        
-        
+        cashDetails(info: resp.response)
     }
     @objc func reloadView(notification: Notification){
         DispatchQueue.main.async {

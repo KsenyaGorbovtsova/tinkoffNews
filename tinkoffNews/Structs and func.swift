@@ -26,13 +26,13 @@ struct detailResponse: Codable {
     let response: detailInfo
 }
 struct detailInfo:Codable {
-    let id: String
+    let slug: String
     let title: String
     let text: String
     let textShort: String
     
     enum CodingKeys: String, CodingKey {
-        case id
+        case slug
         case title
         case text
         case textShort = "textshort"
