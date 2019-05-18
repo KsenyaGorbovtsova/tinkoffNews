@@ -13,7 +13,6 @@
     <entity name="News" representedClassName="News" syncable="YES" codeGenerationType="class">
         <attribute name="clickCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="id" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="slug" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="detailNews" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Detail" inverseName="news" inverseEntity="Detail" syncable="YES"/>
@@ -21,6 +20,6 @@
     <elements>
         <element name="Detail" positionX="-54" positionY="-9" width="128" height="118"/>
         <element name="Load" positionX="-41.3828125" positionY="163.30078125" width="128" height="58"/>
-        <element name="News" positionX="-340.328125" positionY="156.34375" width="128" height="133"/>
+        <element name="News" positionX="-340.328125" positionY="156.34375" width="128" height="118"/>
     </elements>
 </model>

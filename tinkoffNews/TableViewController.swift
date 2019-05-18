@@ -45,7 +45,7 @@ class TableViewController: UITableViewController {
                 loadedNews = try! managedContext.fetch(fetchRequestNews) as! [NSManagedObject]
                 if loadedNews.isEmpty == false {
                     for x in loadedNews {
-                        let appendPiece = piece(id: x.value(forKey: "id") as! String, title: x.value(forKey: "title") as! String, date: x.value(forKey: "date") as! String, slug: x.value(forKey: "slug") as! String, clicks: x.value(forKey: "clickCount") as! Int)
+                        let appendPiece = piece(title: x.value(forKey: "title") as! String, date: x.value(forKey: "date") as! String, slug: x.value(forKey: "slug") as! String, clicks: x.value(forKey: "clickCount") as! Int)
                         listNews.append(appendPiece)
                     }
                 }else {
@@ -75,13 +75,14 @@ class TableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
        
         let cell = tableView.dequeueReusableCell(withIdentifier: "pieceOfNews", for: indexPath)
-        if indexPath == self.indexPathChoosenCell {
+        if indexPath == self.indexPathChoosenCell &&  isInternetAvailable(){
             cell.detailTextLabel?.text = "Просмотры: " + String(self.updateCounter)
         } else {
         let newsInf = self.listNews[indexPath.row]
         cell.textLabel?.text = newsInf.title
         cell.textLabel?.numberOfLines = 0
-        cell.detailTextLabel?.text = "Просмотры: " + String(newsInf.clicks)
+       // cell.detailTextLabel?.text = "Просмотры: " + String(newsInf.clicks ?? 0)
+             cell.detailTextLabel?.text = "Просмотры: " + String(loadedNews[indexPath.row].value(forKey: "clickCount") as! Int)
         }
         return cell
     }
@@ -135,7 +136,8 @@ class TableViewController: UITableViewController {
       
     }
     private func cashNews(news: [piece]) {
-        pageOffset = pageOffset + news.count
+         DispatchQueue.main.async {
+            self.pageOffset = self.pageOffset + news.count
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
         let entityNews = NSEntityDescription.entity(forEntityName: "News", in: context)
@@ -145,26 +147,27 @@ class TableViewController: UITableViewController {
             newNews.setValue(x.title, forKey: "title")
             newNews.setValue(x.slug, forKey: "slug")
             newNews.setValue(x.date, forKey: "date")
-            newNews.setValue(x.id, forKey: "id")
+            
             do {
                 try context.save()
             } catch {
                 print("Failed saving")
             }
         }
-        if pageOffsetManage.isEmpty == true {
+            if self.pageOffsetManage.isEmpty == true {
             let entityCounter = NSEntityDescription.entity(forEntityName: "Load", in: context)
             let counter = NSManagedObject(entity: entityCounter!, insertInto: context)
-            counter.setValue(pageOffset, forKey: "counter")
+                counter.setValue(self.pageOffset, forKey: "counter")
         }else {
-        if pageOffsetManage[0].value(forKey: "counter") as! Int != pageOffset{
-            pageOffsetManage[0].setValue(pageOffset, forKey: "counter")
+                if self.pageOffsetManage[0].value(forKey: "counter") as! Int != self.pageOffset{
+                    self.pageOffsetManage[0].setValue(self.pageOffset, forKey: "counter")
         }
         do {
             try context.save()
         } catch {
             print("Failed saving")
         }
+            }
         }
     }
     @objc func reloadNews (notification: Notification) {

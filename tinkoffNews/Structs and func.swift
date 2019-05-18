@@ -16,11 +16,10 @@ struct news: Codable {
     let news : [piece]
 }
 struct piece: Codable {
-    let id: String
     let title: String
     let date: String
     let slug: String
-    let clicks: Int
+    let clicks: Int?
 }
 
 struct detailResponse: Codable {

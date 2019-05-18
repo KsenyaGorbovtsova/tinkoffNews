@@ -47,7 +47,10 @@ class ViewController: UIViewController {
        
     }
     private func increaseViews(slug: String) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        DispatchQueue.main.async {
+                 guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        
+   
         let managedContext = appDelegate.persistentContainer.viewContext
         let newsFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "News")
         newsFetch.fetchLimit = 1
@@ -63,9 +66,12 @@ class ViewController: UIViewController {
             } catch {
                 print("Failed saving")
             }
+            if isInternetAvailable()
+            {
             NotificationCenter.default.post(name: .reloadCounter, object: nil, userInfo: ["counter": counter])
+            }
         }
-        
+        }
         }
     
     private func cashDetails(info: detailInfo) {
@@ -135,6 +141,8 @@ class ViewController: UIViewController {
         
     }
     @objc func reloadView(notification: Notification){
+        print((self.pieceOfNews?.text.utf8)!)
+        let data = Data((self.pieceOfNews?.text.utf8)!)
         DispatchQueue.main.async {
             let data = Data((self.pieceOfNews?.text.utf8)!)
             if let attributedString = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], documentAttributes: nil) {
