@@ -120,7 +120,7 @@ class TableViewController: UITableViewController {
             }
             dataTask.resume()
         } else {
-            //не верный урл
+              DisplayWarnining(warning: "Попробуйте еще раз", title: "У нас ошибка", dismissing: false, sender: self)
             }
         } else {
             DisplayWarnining(warning: "проверьте подключение к интернету", title: "Упс!", dismissing: false, sender: self)

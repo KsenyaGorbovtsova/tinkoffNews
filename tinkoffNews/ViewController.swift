@@ -112,7 +112,7 @@ class ViewController: UIViewController {
             }
             dataTask.resume()
         } else {
-            //не верный урл
+             DisplayWarnining(warning: "Попробуйте еще раз", title: "У нас ошибка", dismissing: true, sender: self)
         }
         }
         else {
